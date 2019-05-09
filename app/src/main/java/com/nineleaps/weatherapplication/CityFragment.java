@@ -47,7 +47,7 @@ public class CityFragment extends Fragment {
     private MaterialSearchBar searchBar;
 
     ImageView img_weather;
-    TextView txt_city_name,txt_humidity,txt_sunrise,txt_sunset,txt_pressure,txt_temperature,txt_description,txt_date_time,txt_wind,txt_geo_coord;
+    TextView txt_city_name,txt_humidity,txt_sunrise,txt_sunset,txt_pressure,txt_temperature,txt_description,txt_date_time,txt_wind;
     LinearLayout weather_panel;
     ProgressBar loading;
 
@@ -86,7 +86,6 @@ public class CityFragment extends Fragment {
         txt_description = (TextView) itemView.findViewById(R.id.txt_description);
         txt_date_time = (TextView) itemView.findViewById(R.id.txt_date_time);
         txt_wind = (TextView) itemView.findViewById(R.id.txt_wind);
-        txt_geo_coord = (TextView) itemView.findViewById(R.id.txt_geo_coord);
 
         weather_panel = (LinearLayout) itemView.findViewById(R.id.weather_panel);
         loading = (ProgressBar) itemView.findViewById(R.id.loading);
@@ -205,7 +204,6 @@ public class CityFragment extends Fragment {
                         txt_humidity.setText(new StringBuilder(String.valueOf(weatherResult.getMain().getHumidity())).append(" %").toString());
                         txt_sunrise.setText(Common.ConvertUnixtoHour((long) weatherResult.getSys().getSunrise()));
                         txt_sunset.setText(Common.ConvertUnixtoHour((long) weatherResult.getSys().getSunset()));
-                        txt_geo_coord.setText(new StringBuilder(weatherResult.getCoord().toString()).toString());
 
                         weather_panel.setVisibility(View.VISIBLE);
                         loading.setVisibility(View.GONE);

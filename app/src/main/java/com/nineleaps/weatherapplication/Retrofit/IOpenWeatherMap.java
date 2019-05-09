@@ -1,5 +1,6 @@
 package com.nineleaps.weatherapplication.Retrofit;
 
+import com.nineleaps.weatherapplication.Model.WeatherForecastResult;
 import com.nineleaps.weatherapplication.Model.WeatherResult;
 
 import io.reactivex.Observable;
@@ -13,6 +14,11 @@ public interface IOpenWeatherMap {
                                                  @Query("appid") String appid,
                                                  @Query("units") String unit);
 
+    @GET("forecast")
+    Observable<WeatherForecastResult> getWeatherForecastByLatLng(@Query("lat") String lat,
+                                                                 @Query("lon") String lng,
+                                                                 @Query("appid") String appid,
+                                                                 @Query("units") String unit);
     @GET("weather")
     Observable<WeatherResult> getWeatherByCityName(@Query("q") String cityName,
                                                  @Query("appid") String appid,
