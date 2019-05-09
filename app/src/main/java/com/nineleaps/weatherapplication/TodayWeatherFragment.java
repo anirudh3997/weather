@@ -15,7 +15,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.internal.service.Common;
+import com.nineleaps.weatherapplication.Model.WeatherResult;
+import com.nineleaps.weatherapplication.Retrofit.IOpenWeatherMap;
+import com.nineleaps.weatherapplication.Retrofit.RetrofitClient;
 import com.squareup.picasso.Picasso;
 
 import io.reactivex.Scheduler;
@@ -24,6 +26,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
+import com.nineleaps.weatherapplication.Common.Common;
 public class TodayWeatherFragment extends Fragment {
 
     ImageView img_weather;
@@ -44,7 +47,7 @@ public class TodayWeatherFragment extends Fragment {
     public TodayWeatherFragment() {
         compositeDisposable = new CompositeDisposable();
         Retrofit retrofit = RetrofitClient.getInstance();
-        mService = retrofit.create(IopenWeatherMap.class);
+        mService = retrofit.create(IOpenWeatherMap.class);
     }
 
     @Override
@@ -71,36 +74,41 @@ public class TodayWeatherFragment extends Fragment {
     }
 
     private void getWeatherInformation() {
-        compositeDisposable.add(mService.getWeatherByLatLng(String.valueOf(Common.current_location),
+        compositeDisposable.add(mService.getWeatherByLatLng(String.valueOf(Common.current_location.getLatitude()),
                 String.valueOf(Common.current_location.getLongitude()),
                 Common.APP_ID,
                 "metric")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<WeatherResult>(){
+                .subscribe(new io.reactivex.functions.Consumer<WeatherResult>() {
                     @Override
-                    public void accept(WeatherResult weatherResult) throws  Exception {
-
+                    public void accept(WeatherResult weatherResult) throws Exception {
                         Picasso.get().load(new StringBuilder("https://openweathermap.org/img/w/")
                                 .append(weatherResult.getWeather().get(0).getIcon())
-                        .append(".png").toString()).into(img_weather);
+                                .append(".png").toString()).into(img_weather);
 
                         txt_city_name.setText(weatherResult.getName());
                         txt_description.setText(new StringBuilder("Weather in")
-                        .append(weatherResult.getName()).toString());
+                                .append(weatherResult.getName()).toString());
                         txt_temperature.setText(new StringBuilder(
                                 String.valueOf(weatherResult.getMain().getTemp())).append("°C").toString());
                         txt_date_time.setText(Common.ConvertUnixToDate(weatherResult.getDt()));
+                        txt_pressure.setText(new StringBuilder(String.valueOf(weatherResult.getMain().getPressure())).append(" hpa").toString());
+                        txt_humidity.setText(new StringBuilder(String.valueOf(weatherResult.getMain().getHumidity())).append(" %").toString());
+                        txt_sunrise.setText(Common.ConvertUnixtoHour((long) weatherResult.getSys().getSunrise()));
+                        txt_sunset.setText(Common.ConvertUnixtoHour((long) weatherResult.getSys().getSunset()));
+                        txt_geo_coord.setText(new StringBuilder(weatherResult.getCoord().toString()).toString());
 
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Exception {
-                            Toast.makeText(getActivity(),""+throwable.getMessage(),Toast.LENGTH_SHORT).show();
-
-                        }
+                        weather_panel.setVisibility(View.VISIBLE);
+                        loading.setVisibility(View.GONE);
                     }
-                }))
+                }, new io.reactivex.functions.Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(getActivity(),""+throwable.getMessage(),Toast.LENGTH_SHORT).show();
+                    }
+                }));
+
     }
 }
-
 
